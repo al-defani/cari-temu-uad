@@ -23,5 +23,14 @@ class DatabaseSeeder extends Seeder
         \App\Models\Category::create(['nama' => 'Kunci / Aksesoris']);
         \App\Models\Category::create(['nama' => 'Pakaian / Tas']);
         \App\Models\Category::create(['nama' => 'Lainnya']);
+
+        \App\Models\User::updateOrCreate(
+            ['email' => '2300018158@webmail.uad.ac.id'],
+            [
+                'name' => 'Admin Utama',
+                'password' => \Illuminate\Support\Facades\Hash::make('12345678'),
+                'is_admin' => 1,
+            ]
+        );
     }
 }
