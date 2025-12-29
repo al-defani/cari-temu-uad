@@ -5,8 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\AdminController;
 use App\Models\Item;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 Route::get('/', function () {
     $totalHilang = Item::where('jenis', 'hilang')->where('status', 'aktif')->count();
@@ -41,11 +39,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/items/{item}', [AdminController::class, 'destroy'])->name('items.destroy');
 });
 
-Route::get('/perbaiki-admin', function () {
-    User::where('email', '2300018158@webmail.uad.ac.id')->update([
-        'password' => Hash::make('password'),
-        'is_admin' => 1
-    ]);
-    return "Password Admin Berhasil Diperbarui!";
-});
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
