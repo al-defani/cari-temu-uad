@@ -1,3 +1,54 @@
+# 🔍 Cari-Temu UAD (Lost and Found System)
+
+Aplikasi berbasis web untuk membantu mahasiswa Universitas Ahmad Dahlan (UAD) melaporkan dan menemukan barang yang hilang di area kampus.
+
+---
+
+## 🏗️ System Architecture
+
+Aplikasi ini dibangun menggunakan arsitektur modern dengan alur kerja **CI/CD (Continuous Integration/Continuous Deployment)**.
+
+1.  **Backend & Frontend:** Laravel 11 (PHP 8.2) dengan Blade Templating Engine dan Vite untuk manajemen aset.
+2.  **Database:** MySQL yang dikelola melalui layanan database Railway.
+3.  **Authentication:** Laravel Breeze untuk sistem keamanan login dan registrasi.
+4.  **Hosting & Deployment:** * **GitHub** sebagai version control sistem.
+    * **Railway (PaaS)** sebagai server produksi yang terhubung langsung ke GitHub.
+    * **SSL/HTTPS:** Dipaksa melalui `AppServiceProvider` untuk menjamin keamanan pengiriman data.
+5.  **Storage:** Menggunakan *Symbolic Link* (`php artisan storage:link`) untuk manajemen file gambar secara dinamis.
+
+
+
+---
+
+## 📋 Fitur Pengembangan (Checklist)
+
+Berikut adalah progres fitur yang telah diimplementasikan dalam sistem:
+
+### 👤 Fitur User
+- [x] **Registrasi & Login:** Sistem autentikasi aman untuk mahasiswa.
+- [x] **Lapor Barang:** Form unggah informasi barang hilang/temu beserta foto.
+- [x] **Pencarian Barang:** Filter barang berdasarkan nama atau deskripsi.
+- [x] **Detail Barang:** Halaman informasi lengkap mengenai barang yang ditemukan.
+
+### 🛡️ Fitur Admin
+- [x] **Dashboard Admin:** Statistik ringkas mengenai laporan barang.
+- [x] **Manajemen Kategori:** Admin dapat menambah, melihat, dan **menghapus kategori** barang.
+- [x] **Otorisasi Admin:** Pengecekan status `is_admin` di database untuk akses fitur khusus.
+
+### ⚙️ Teknis & Keamanan
+- [x] **Database Seeding:** Pengisian data awal (kategori/user admin) secara otomatis.
+- [x] **Force HTTPS:** Mengamankan aplikasi di lingkungan produksi (Railway).
+- [x] **Production Deployment:** Aplikasi dapat diakses secara publik melalui domain Railway.
+
+---
+
+## 🛠️ Cara Menjalankan Secara Lokal
+1. Clone repo: `git clone [LINK_REPO_KAMU]`
+2. Install dependencies: `composer install` & `npm install`
+3. Setup `.env` (Database & APP_KEY)
+4. Jalankan migrasi: `php artisan migrate --seed`
+5. Jalankan server: `php artisan serve`
+
 <<<<<<< HEAD
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
