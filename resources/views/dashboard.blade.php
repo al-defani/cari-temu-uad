@@ -132,62 +132,59 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const itemGrid = document.getElementById('itemGrid');
-            const paginationWrapper = document.getElementById('paginationWrapper');
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const itemGrid = document.getElementById('itemGrid');
+        const paginationWrapper = document.getElementById('paginationWrapper');
 
-            searchInput.addEventListener('input', function() {
-                let query = searchInput.value;
+        function performSearch() {
+            let query = searchInput.value;
+            let cat = categoryFilter.value;
+            let stat = statusFilter.value;
 
-                // Jika query kosong, biarkan user tekan filter manual atau refresh
-                // Tapi kita tetap jalankan fetch untuk live experience
-                fetch(`/items/search?q=${query}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Sembunyikan pagination saat mencari
-                        paginationWrapper.style.display = query.length > 0 ? 'none' : 'block';
-                        itemGrid.innerHTML = '';
+            // Kita tambahkan parameter category dan status ke dalam fetch
+            fetch(`/items/search?q=${query}&category=${cat}&status=${stat}`)
+                .then(response => response.json())
+                .then(data => {
+                    paginationWrapper.style.display = (query.length > 0 || cat !== '' || stat !== '') ? 'none' : 'block';
+                    itemGrid.innerHTML = '';
 
-                        if (data.length > 0) {
-                            data.forEach(item => {
-                                const badgeColor = item.jenis === 'hilang' ? 'bg-red-600' : 'bg-green-600';
-                                const categoryName = item.category ? item.category.nama : 'Umum';
-                                const itemFoto = item.foto 
-                                    ? `<img src="/storage/${item.foto}" class="w-full h-full object-cover">`
-                                    : `<div class="w-full h-full flex items-center justify-center text-gray-400"><span class="text-xs">Tidak ada foto</span></div>`;
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            const badgeColor = item.jenis === 'hilang' ? 'bg-red-600' : 'bg-green-600';
+                            const categoryName = item.category ? item.category.nama : 'Umum';
+                            const itemFoto = item.foto 
+                                ? `<img src="/storage/${item.foto}" class="w-full h-full object-cover">`
+                                : `<div class="w-full h-full flex items-center justify-center text-gray-400"><span class="text-xs">Tidak ada foto</span></div>`;
 
-                                itemGrid.innerHTML += `
-                                    <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
-                                        <div class="relative h-48 bg-gray-200">
-                                            ${itemFoto}
-                                            <div class="absolute top-3 left-3">
-                                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase text-white ${badgeColor}">
-                                                    ${item.jenis}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="p-5">
-                                            <span class="text-[10px] text-blue-600 font-bold uppercase">${categoryName}</span>
-                                            <h3 class="font-bold text-lg text-gray-800 truncate mb-1">${item.nama_barang}</h3>
-                                            <p class="text-sm text-gray-600 mb-4">${item.lokasi}</p>
-                                            <a href="/items/${item.id}" class="block text-center bg-[#1e3a8a] text-white py-2 rounded-xl text-sm font-bold">
-                                                Lihat Detail
-                                            </a>
+                            itemGrid.innerHTML += `
+                                <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+                                    <div class="relative h-48 bg-gray-200">${itemFoto}
+                                        <div class="absolute top-3 left-3">
+                                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase text-white ${badgeColor}">${item.jenis}</span>
                                         </div>
                                     </div>
-                                `;
-                            });
-                        } else {
-                            itemGrid.innerHTML = '<div class="col-span-full text-center py-20 bg-white rounded-2xl border-2 border-dashed"><p class="text-gray-500">Barang tidak ditemukan.</p></div>';
-                        }
-                    })
-                    .catch(error => console.error('Fetch error:', error));
-            });
-        });
-    </script>
+                                    <div class="p-5">
+                                        <span class="text-[10px] text-blue-600 font-bold uppercase">${categoryName}</span>
+                                        <h3 class="font-bold text-lg text-gray-800 truncate mb-1">${item.nama_barang}</h3>
+                                        <p class="text-sm text-gray-600 mb-4">${item.lokasi}</p>
+                                        <a href="/items/${item.id}" class="block text-center bg-[#1e3a8a] text-white py-2 rounded-xl text-sm font-bold">Lihat Detail</a>
+                                    </div>
+                                </div>`;
+                        });
+                    } else {
+                        itemGrid.innerHTML = '<div class="col-span-full text-center py-20 bg-white rounded-2xl border-2 border-dashed"><p class="text-gray-500">Barang tidak ditemukan.</p></div>';
+                    }
+                });
+        }
+
+        // Jalankan pencarian saat input apa pun berubah
+        searchInput.addEventListener('input', performSearch);
+        categoryFilter.addEventListener('change', performSearch);
+        statusFilter.addEventListener('change', performSearch);
+    });
+</script>
     
 </x-app-layout>

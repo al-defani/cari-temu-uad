@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\AdminController;
 use App\Models\Item;
+use App\Http\Controllers\CategoryController;
 
 Route::get('/', function () {
     $totalHilang = Item::where('jenis', 'hilang')->where('status', 'aktif')->count();
@@ -38,5 +39,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
     Route::delete('/items/{item}', [AdminController::class, 'destroy'])->name('items.destroy');
 });
+
 
 require __DIR__ . '/auth.php';

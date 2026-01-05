@@ -57,48 +57,46 @@ class ItemController extends Controller
     }
 
     public function index(Request $request)
-    {
-        // 1. Ambil input dari filter
-        $search = $request->input('search');
-        $category = $request->input('category');
-        $status = $request->input('status');
-        $query = Item::query();
+{
+    // 1. Ambil kategori untuk isi dropdown
+    $categories = Category::all();
 
-        // 2. Query data dengan filter (jika ada)
-        $items = Item::with('category')
-            ->when($search, function($query) use ($search) {
-            $query->where('nama_barang', 'like', '%' . $search . '%');
-            })
-            ->when($category, function($query) use ($category) {
-                $query->where('category_id', $category);
-            })
-            ->when($status, function($query) use ($status) {
-                $query->where('status', $status);
-            })
-            ->latest()
-            ->paginate(8);
+    // 2. Mulai Query dengan Eager Loading category
+    $query = Item::with('category');
 
-        // 3. Ambil kategori untuk isi dropdown
-        $categories = Category::all();
-        
-        // Logika Pencarian
-        if ($request->has('search')) {
-            $query->where('nama_barang', 'like', '%' . $request->search . '%')
-                ->orWhere('lokasi', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->filled('jenis')) {
-            $query->where('jenis', $request->jenis);
-        }
-
-        $totalHilang = Item::where('jenis', 'hilang')->where('status', 'aktif')->count();
-        $totalTemu = Item::where('jenis', 'temu')->where('status', 'aktif')->count();
-        $totalSelesai = Item::where('status', 'selesai')->count();
-
-        $items = $query->latest()->paginate(9);
-
-        return view('dashboard', compact('items', 'categories', 'totalHilang', 'totalTemu', 'totalSelesai'));
+    // 3. Jalankan Filter Pencarian (Nama Barang atau Lokasi)
+    if ($request->filled('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('nama_barang', 'like', '%' . $request->search . '%')
+              ->orWhere('lokasi', 'like', '%' . $request->search . '%');
+        });
     }
+
+    // 4. Filter Kategori
+    if ($request->filled('category')) {
+        $query->where('category_id', $request->category);
+    }
+
+    // 5. Filter Status (Aktif/Selesai)
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // 6. Filter Jenis (Hilang/Temu) - Jika ada dari tombol navigasi
+    if ($request->filled('jenis')) {
+        $query->where('jenis', $request->jenis);
+    }
+
+    // 7. Ambil Hasil Akhir dengan Pagination
+    $items = $query->latest()->paginate(9)->withQueryString();
+
+    // 8. Hitung Statistik (Tetap hitung dari seluruh data asli agar angka tidak berubah saat difilter)
+    $totalHilang = Item::where('jenis', 'hilang')->where('status', 'aktif')->count();
+    $totalTemu = Item::where('jenis', 'temu')->where('status', 'aktif')->count();
+    $totalSelesai = Item::where('status', 'selesai')->count();
+
+    return view('dashboard', compact('items', 'categories', 'totalHilang', 'totalTemu', 'totalSelesai'));
+}
 
     public function show(Item $item)
     {
